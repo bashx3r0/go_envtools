@@ -2,9 +2,6 @@ package envtools
 
 import (
 	"log"
-	"os"
-	"strings"
-
 	"github.com/joho/godotenv"
 )
 
@@ -14,12 +11,12 @@ func GetSingleEnv(envvar string, envpath string) string {
 		envpath = ".env"
 	}
 
-	err := godotenv.Load(envpath)
+	envvalue, err := godotenv.Read(envpath)
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	param := os.Getenv(envvar)
+	param := envvalue[envvar]
 
 	if param == "" {
 		log.Fatalf("%v is not set.", envvar)
@@ -36,22 +33,10 @@ func GetAllEnv(envpath string) map[string]string {
 		envpath = ".env"
 	}
 
-	err := godotenv.Load(envpath)
+	envMap, err := godotenv.Read(envpath)
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
-
-	envMap := make(map[string]string)
-
-	for _, env := range os.Environ() {
-        
-        pair := strings.SplitN(env, "=", 2)
-        if len(pair) != 2 {
-            continue // will variable with invalid format
-        }
-        
-        envMap[pair[0]] = pair[1]
-    }
 
 	return envMap
 
